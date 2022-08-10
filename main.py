@@ -37,7 +37,7 @@ def main():
         #ヘッダー2を入力
         notion_create.block.heading_2(list_pageid,f"{count+1}位 {Trend['name']}")
         notion_create.block.text(list_pageid,f"投稿数：{Trend['post_num']} メンバー数：{Trend['member_num']} 閲覧数：{Trend['view_num']}")
-        notion_create.block.link_text(list_pageid,f"{Trend['name']}をHoYoLABで開く",f"https://www.hoyolab.com/topicDetail/{Trend['id']}?game_id=2)")
+        notion_create.block.link_text(list_pageid,f"{Trend['name']}をHoYoLABで開く",f"https://www.hoyolab.com/topicDetail/{Trend['id']}?game_id=2")
 
         #トレンドのトピックデータベース追加
         Topic_database = notion_create.topic_database.database(list_pageid,f"{Trend['name']} トレンド",Trend["cover_img"])
@@ -109,6 +109,12 @@ def article(page_id,post_id):
     elif article_data["view_type"] == 5:
         notion_create.block.Video(page_id,article_data["body"]["video"])
         notion_create.block.text(page_id,article_data["body"]["describe"])
+    elif article_data["view_type"] == 6:
+        notion_create.block.text(page_id,article_data["body"]["topic_content"])
+        try:
+            notion_create.block.image(page_id,article_data["body"]["cover"])
+        except:
+            notion_create.block.image(page_id,article_data["body"]["img"])
     else:
         print("view_typeが対応していません")
 

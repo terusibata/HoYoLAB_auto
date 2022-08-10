@@ -24,6 +24,8 @@ def body(post_id=None):
         return view_type_2(res)
     elif view_type == 5:
         return view_type_5(res)
+    elif view_type == 6:
+        return view_type_6(res)
     else:
         print(view_type)
 
@@ -149,6 +151,28 @@ def view_type_5(res):
 
     return data
 
+def view_type_6(res):
+    data = {}
+
+    data["title"] = res["data"]["post"]["post"]["subject"]
+    data["post_id"] = res["data"]["post"]["post"]["post_id"]
+    data["uid"] = res["data"]["post"]["post"]["uid"]
+    data["view_type"] = res["data"]["post"]["post"]["view_type"]
+
+    body_datas = {}
+
+    body = res["data"]["post"]["post"]["content"]
+    body = pretty_json(body)
+
+    body_datas["topic_id"] = body["topic"]["topic_id"]
+    body_datas["topic_name"] = body["topic"]["topic_name"]
+    body_datas["topic_content"] = body["topic"]["content"]
+    body_datas["img"] = body["photo"]["url"]
+    body_datas["cover"] = body["cover"]["url"]
+
+    data["body"] = body_datas
+
+    return data
 
 def pretty_json(obj):
     temp = json.loads(obj) if isinstance(obj, str) else obj
