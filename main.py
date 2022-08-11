@@ -120,13 +120,34 @@ def article(page_id,post_id):
 
 
 def comment(page_id,post_id,title):
-    comment_page = notion_create.comment_database.database(page_id,"「"+title+"」のコメント")
+    #コメント全部取得
     comment_data = HoYo_content.comment(post_id)
-
-    for comment in comment_data:
-        notion_create.comment_database.database_page(comment_page,comment)
-
-    
+    #1万件以上の場合複数のデータベースに分ける
+    if len(comment_data) <= 10000:
+        comment_page = notion_create.comment_database.database(
+            page_id,
+            "「"+title+"」のコメント"
+        )
+        for comment in comment_data:
+            notion_create.comment_database.database_page(comment_page,comment)
+    else:
+        notion_create.block.text(
+            page_id,
+            "コメントの数が多いため1万件ごとのデータベースに分かれています"
+        )
+        comment_page = notion_create.comment_database.database(
+            page_id,
+            "「"+title+"」のコメント ～10000件"
+        )
+        for count,comment in enumerate(comment_data):
+            notion_create.comment_database.database_page(comment_page,comment)
+            
+            if (count + 1) % 10000 == 0 and count != 0:
+                comment_page = notion_create.comment_database.database(
+                    page_id,
+                    "「"+title+"」のコメント ～"+(count+1+10000)+"件"
+                )
+                          
 keep_alive.keep_alive()
 
 while True:
