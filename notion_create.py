@@ -12,6 +12,25 @@ class OneselfError(Exception):
 def get_request_url(end_point):
     return f'https://api.notion.com/v1/{end_point}'
 
+def notion_request(url_data,method,json_data):
+    count = 0
+    while True:
+        try:
+            requests.request(
+                    method,
+                    url=get_request_url(url_data),
+                    headers=headers,
+                    json=json_data)
+            break
+        except:
+            count = count + 1
+            print(f"{count}回目のエラーが発生しました")
+            if count >= 5:
+                print("requestをスルーしました")
+                break
+        
+    
+
 
 notion_api_key = os.environ['notion_api_key']
 
@@ -40,14 +59,9 @@ class block():
                 },
             }]
         }
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("ヘッダー2入力完了")
-        #pprint(response.json())
 
     def text(block_id=None, content_text=None):
         create_json = {
@@ -66,14 +80,9 @@ class block():
                 },
             }]
         }
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("テキスト入力完了")
-        #pprint(response.json())
 
     def link_text(block_id=None, content_text=None, link=None):
         create_json = {
@@ -95,14 +104,9 @@ class block():
                 },
             }]
         }
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("リンクテキスト入力完了")
-        #pprint(response.json())
 
     def divider(block_id=None):
         create_json = {
@@ -112,14 +116,9 @@ class block():
                 "divider": {}
             }]
         }
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("区切り線の書き込み完了")
-        #pprint(response.json())
 
     def image(block_id=None, img=None):
         create_json = {
@@ -133,14 +132,9 @@ class block():
                 }
             }]
         }
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("画像の埋め込み完了")
-        #pprint(response.json())
 
     def Video(block_id=None, Video=None):
         create_json = {
@@ -154,26 +148,15 @@ class block():
                 }
             }]
         }
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("ビデオの埋め込み完了")
-        #pprint(response.json())
 
     def embed(block_id=None, url=None):
         create_json = {"children": [{"type": "embed", "embed": {"url": url}}]}
-        response = requests.request(
-            'patch',
-            url=get_request_url(f'blocks/{block_id}/children'),
-            headers=headers,
-            json=create_json)
+        notion_request(f'blocks/{block_id}/children','patch',create_json)
         time.sleep(0.3)
         print("埋め込み完了")
-        #pprint(response.json())
-
 
 class date_database():
     def database(block_id=None, content_text=None):
@@ -348,22 +331,16 @@ class comment_database():
             }
         }
         try:
-            response = requests.request('post',
-                                        url=get_request_url('pages'),
-                                        headers=headers,
-                                        json=create_json)
-        except Exception as e:
-            print(e)
+            requests.request(
+                'post',
+                url=get_request_url('pages'),
+                headers=headers,
+                json=create_json
+            )
+        except:
+            print("コメントの追加に失敗しました")
         #pprint(response.json())
         time.sleep(0.3)
-        try:
-            response_id = response.json()["id"]
-            print(f'{block_id }のデータベースに新しいページを作成しました')
-        except:
-            response_id = None
-            print("アップロードに失敗しました")
-            pprint(response)
-        return response_id
 
 
 class topic_database():
@@ -423,7 +400,6 @@ class topic_database():
                                     url=get_request_url('databases'),
                                     headers=headers,
                                     json=create_json)
-        #pprint(response.json())
         time.sleep(0.3)
         print(f'{response.json()["id"]}にデータベースを作成しました')
         return response.json()["id"]

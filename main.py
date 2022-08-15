@@ -145,7 +145,7 @@ def comment(page_id,post_id,title):
             if (count + 1) % 10000 == 0 and count != 0:
                 comment_page = notion_create.comment_database.database(
                     page_id,
-                    "「"+title+"」のコメント ～"+(count+1+10000)+"件"
+                    "「"+title+"」のコメント ～"+str(count+1+10000)+"件"
                 )
                           
 keep_alive.keep_alive()
@@ -154,6 +154,19 @@ while True:
   try:
     main()
     print("一周完了しました。繰り返します")
-  except:
+  except Exception as e:
     print("エラーが発生しました")
+    #現在の時間を取得　  
+    dt_now = datetime.datetime.now(
+        datetime.timezone(datetime.timedelta(hours=9))
+      )
+    now = {
+        "year":dt_now.year,
+        "month":dt_now.month,
+        "day":dt_now.day,
+        "hour":dt_now.hour,
+        "minute":dt_now.minute
+    }
+    with open(f'{now["year"]}-{now["month"]}-{now["day"]}-{now["hour"]}-{now["minute"]}.txt', 'w') as f:
+        f.write(str(e))
     time.sleep(5)
